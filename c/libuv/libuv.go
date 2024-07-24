@@ -97,7 +97,7 @@ type Loop struct {
 }
 
 type Handle struct {
-	Unused [0]byte
+	Unused [96]byte
 }
 
 type Dir struct {
@@ -105,7 +105,7 @@ type Dir struct {
 }
 
 type Stream struct {
-	Unused [0]byte
+	Unused [264]byte
 }
 
 type Pipe struct {
@@ -159,7 +159,7 @@ type Shutdown struct {
 }
 
 type Write struct {
-	Unused [0]byte
+	Unused [192]byte
 }
 
 type Connect struct {
@@ -363,22 +363,22 @@ func (stream *Stream) StopRead() c.Int {
 }
 
 // llgo:link (*Write).Write C.uv_write
-func (req *Write) Write(stream *Stream, bufs []Buf, nbufs c.Uint, writeCb WriteCb) c.Int {
+func (req *Write) Write(stream *Stream, bufs *Buf, nbufs c.Uint, writeCb WriteCb) c.Int {
 	return 0
 }
 
 // llgo:link (*Write).Write2 C.uv_write2
-func (req *Write) Write2(stream *Stream, bufs []Buf, nbufs c.Uint, sendStream *Stream, writeCb WriteCb) c.Int {
+func (req *Write) Write2(stream *Stream, bufs *Buf, nbufs c.Uint, sendStream *Stream, writeCb WriteCb) c.Int {
 	return 0
 }
 
 // llgo:link (*Stream).TryWrite C.uv_try_write
-func (stream *Stream) TryWrite(bufs []Buf, nbufs c.Uint) c.Int {
+func (stream *Stream) TryWrite(bufs *Buf, nbufs c.Uint) c.Int {
 	return 0
 }
 
 // llgo:link (*Stream).TryWrite2 C.uv_try_write2
-func (stream *Stream) TryWrite2(bufs []Buf, nbufs c.Uint, sendStream *Stream) c.Int {
+func (stream *Stream) TryWrite2(bufs *Buf, nbufs c.Uint, sendStream *Stream) c.Int {
 	return 0
 }
 
