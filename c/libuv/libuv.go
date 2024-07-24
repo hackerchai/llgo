@@ -3,7 +3,6 @@ package libuv
 import (
 	"github.com/goplus/llgo/c"
 	"github.com/goplus/llgo/c/net"
-	"unsafe"
 	_ "unsafe"
 )
 
@@ -215,37 +214,17 @@ type PollCb func(handle *Poll, status c.Int, events c.Int)
 
 // ----------------------------------------------
 
-//go:linkname UvVersion C.uv_version
-func UvVersion() c.Uint
+//go:linkname Version C.uv_version
+func Version() c.Uint
 
-//go:linkname UvVersionString C.uv_version_string
-func UvVersionString() *c.Char
+//go:linkname VersionString C.uv_version_string
+func VersionString() *c.Char
 
-//go:linkname UvLibraryShutdown C.uv_library_shutdown
-func UvLibraryShutdown()
+//go:linkname LibraryShutdown C.uv_library_shutdown
+func LibraryShutdown()
 
-//go:linkname UvReplaceAllocator C.uv_replace_allocator
-func UvReplaceAllocator(mallocFunc MallocFunc, reallocFunc ReallocFunc, callocFunc CallocFunc, freeFunc FreeFunc) c.Int
-
-// Version returns the version of libuv.
-func Version() int {
-	return int(UvVersion())
-}
-
-// VersionString returns the version string of libuv.
-func VersionString() string {
-	return c.GoString(UvVersionString())
-}
-
-// LibraryShutdown shuts down the libuv library.
-func LibraryShutdown() {
-	UvLibraryShutdown()
-}
-
-// ReplaceAllocator replaces the allocator functions used by libuv.
-func ReplaceAllocator(mallocFunc MallocFunc, reallocFunc ReallocFunc, callocFunc CallocFunc, freeFunc FreeFunc) int {
-	return int(UvReplaceAllocator(mallocFunc, reallocFunc, callocFunc, freeFunc))
-}
+//go:linkname ReplaceAllocator C.uv_replace_allocator
+func ReplaceAllocator(mallocFunc MallocFunc, reallocFunc ReallocFunc, callocFunc CallocFunc, freeFunc FreeFunc) c.Int
 
 // ----------------------------------------------
 
@@ -422,148 +401,57 @@ func (stream *Stream) SetBlocking(blocking c.Int) c.Int {
 
 /* Loop related functions and method. */
 
-//go:linkname UvLoopSize C.uv_loop_size
-func UvLoopSize() uintptr
+//go:linkname LoopSize C.uv_loop_size
+func LoopSize() uintptr
 
-//go:linkname UvRun C.uv_run
-func UvRun(loop *Loop, mode RunMode) c.Int
+//go:linkname Run C.uv_run
+func Run(loop *Loop, mode RunMode) c.Int
 
-//go:linkname UvLoopAlive C.uv_loop_alive
-func UvLoopAlive(loop *Loop) c.Int
+//go:linkname LoopAlive C.uv_loop_alive
+func LoopAlive(loop *Loop) c.Int
 
-//go:linkname UvLoopClose C.uv_loop_close
-func UvLoopClose(loop *Loop) c.Int
+//go:linkname LoopClose C.uv_loop_close
+func LoopClose(loop *Loop) c.Int
 
-//go:linkname UvLoopConfigure C.uv_loop_configure
-func UvLoopConfigure(loop *Loop, option LoopOption, arg c.Int) c.Int
+//go:linkname LoopConfigure C.uv_loop_configure
+func LoopConfigure(loop *Loop, option LoopOption, arg c.Int) c.Int
 
-//go:linkname UvLoopDefault C.uv_default_loop
-func UvLoopDefault() *Loop
+//go:linkname LoopDefault C.uv_default_loop
+func LoopDefault() *Loop
 
-//go:linkname UvLoopDelete C.uv_loop_delete
-func UvLoopDelete(loop *Loop) c.Int
+//go:linkname LoopDelete C.uv_loop_delete
+func LoopDelete(loop *Loop) c.Int
 
-//go:linkname UvLoopFork C.uv_loop_fork
-func UvLoopFork(loop *Loop) c.Int
+//go:linkname LoopFork C.uv_loop_fork
+func LoopFork(loop *Loop) c.Int
 
-//go:linkname UvLoopInit C.uv_loop_init
-func UvLoopInit(loop *Loop) c.Int
+//go:linkname LoopInit C.uv_loop_init
+func LoopInit(loop *Loop) c.Int
 
-//go:linkname UvLoopNew C.uv_loop_new
-func UvLoopNew() *Loop
+//go:linkname LoopNew C.uv_loop_new
+func LoopNew() *Loop
 
-//go:linkname UvLoopNow C.uv_now
-func UvLoopNow(loop *Loop) c.UlongLong
+//go:linkname LoopNow C.uv_now
+func LoopNow(loop *Loop) c.UlongLong
 
-//go:linkname UvLoopUpdateTime C.uv_update_time
-func UvLoopUpdateTime(loop *Loop)
+//go:linkname LoopUpdateTime C.uv_update_time
+func LoopUpdateTime(loop *Loop)
 
-//go:linkname UvLoopBackendFd C.uv_backend_fd
-func UvLoopBackendFd(loop *Loop) c.Int
+//go:linkname LoopBackendFd C.uv_backend_fd
+func LoopBackendFd(loop *Loop) c.Int
 
-//go:linkname UvLoopBackendTimeout C.uv_backend_timeout
-func UvLoopBackendTimeout(loop *Loop) c.Int
+//go:linkname LoopBackendTimeout C.uv_backend_timeout
+func LoopBackendTimeout(loop *Loop) c.Int
 
-//go:linkname UvLoopWalk C.uv_walk
-func UvLoopWalk(loop *Loop, walkCb WalkCb, arg c.Pointer)
-
-// DefaultLoop returns the default loop.
-func (l *Loop) DefaultLoop() *Loop {
-	return UvLoopDefault()
-}
-
-// Size returns the size of the loop.
-func (l *Loop) Size() uintptr {
-	return UvLoopSize()
-}
-
-// Init initializes the loop.
-func (l *Loop) Init() int {
-	return int(UvLoopInit(l))
-}
-
-// Run runs the loop.
-func (l *Loop) Run(mode RunMode) int {
-	return int(UvRun(l, mode))
-}
-
-// Stop closes the loop.
-func (l *Loop) Stop() int {
-	return int(UvLoopClose(l))
-}
-
-// Default creates a new loop.
-func (l *Loop) Default() *Loop {
-	return UvLoopDefault()
-}
-
-// New creates a new loop.
-func (l *Loop) New() *Loop {
-	return UvLoopNew()
-}
-
-// Deprecated: use LoopClose instead.
-// Delete closes the loop.
-func (l *Loop) Delete() int {
-	return int(UvLoopDelete(l))
-}
-
-// Alive returns the status of the loop.
-func (l *Loop) Alive() int {
-	return int(UvLoopAlive(l))
-}
-
-// Close closes the loop.
-func (l *Loop) Close() int {
-	return int(UvLoopClose(l))
-}
-
-// Configure configures the loop.
-func (l *Loop) Configure(loop *Loop, option int, arg int) int {
-	return int(UvLoopConfigure(l, LoopOption(c.Int(option)), c.Int(arg)))
-}
-
-// Walk walks the loop.
-func (l *Loop) Walk(walkCb WalkCb, arg c.Pointer) {
-	UvLoopWalk(l, walkCb, arg)
-}
-
-// Fork forks the loop.
-func (l *Loop) Fork(loop *Loop) int {
-	return int(UvLoopFork(l))
-}
-
-// UpdateTime updates the time of the loop.
-func (l *Loop) UpdateTime() {
-	UvLoopUpdateTime(l)
-}
-
-// Now returns the current time of the loop.
-func (l *Loop) Now() uint64 {
-	return uint64(UvLoopNow(l))
-}
-
-// BackendFd returns the backend file descriptor of the loop.
-func (l *Loop) BackendFd() int {
-	return int(UvLoopBackendFd(l))
-}
-
-// BackendTimeout returns the backend timeout of the loop.
-func (l *Loop) BackendTimeout() int {
-	return int(UvLoopBackendTimeout(l))
-}
+//go:linkname LoopWalk C.uv_walk
+func LoopWalk(loop *Loop, walkCb WalkCb, arg c.Pointer)
 
 // ----------------------------------------------
 
 /* Buf related functions and method. */
 
-//go:linkname UvInitBuf C.uv_buf_init
-func UvInitBuf(base *c.Char, len c.Uint) Buf
-
-// InitBuf initializes a buffer with the given c.Char slice.
-func InitBuf(buffer []c.Char) Buf {
-	return UvInitBuf((*c.Char)(unsafe.Pointer(&buffer[0])), c.Uint(unsafe.Sizeof(buffer)))
-}
+//go:linkname InitBuf C.uv_buf_init
+func InitBuf(base *c.Char, len c.Uint) Buf
 
 // ----------------------------------------------
 
@@ -577,21 +465,6 @@ func PollStart(handle *Poll, events c.Int, cb PollCb) c.Int
 
 //go:linkname PollStop C.uv_poll_stop
 func PollStop(handle *Poll) c.Int
-
-// Init initializes the poll handle with the given file descriptor.
-func (p *Poll) Init(loop *Loop, fd OsFd) int {
-	return int(PollInit(loop, p, fd))
-}
-
-// Start starts polling the file descriptor.
-func (p *Poll) Start(events int, cb PollCb) int {
-	return int(PollStart(p, c.Int(events), cb))
-}
-
-// Stop stops polling the file descriptor.
-func (p *Poll) Stop() int {
-	return int(PollStop(p))
-}
 
 // ----------------------------------------------
 
